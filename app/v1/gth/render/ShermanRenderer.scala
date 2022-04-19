@@ -11,21 +11,20 @@ class ShermanRenderer @Inject()() {
 
   def render(gallifreyan: Iterable[ShermanWord], params: RenderingParams = RenderingParams()): xml.Node =
     Utility.trim {
-      val totalMargin = params.margin + params.lineWidth
-      val charRadius = params.fontSize / 2.0 + totalMargin
+      val charRadius = params.fontSize / 2.0 + params.margin
 
       def getContentPos(n: Int, innerRadius: Double) = n match {
         case 1 => 0.0
-        case _ => (innerRadius + totalMargin) / Math.sin(Math.PI / n)
+        case _ => (innerRadius + params.margin) / Math.sin(Math.PI / n)
       }
 
-      val maxChars = gallifreyan.map(_.chars.length).max
-      val charPos = getContentPos(maxChars, charRadius)
+      val maxWordLen = gallifreyan.map(_.chars.length).max
+      val charPos = getContentPos(maxWordLen, charRadius)
 
-      val wordRadius = charPos + charRadius + totalMargin
+      val wordRadius = charPos + charRadius + params.margin
       val wordPos = getContentPos(gallifreyan.size, wordRadius)
 
-      val sentenceRadius = wordPos + wordRadius + totalMargin
+      val sentenceRadius = wordPos + wordRadius + params.margin
       val canvasHalfSize = sentenceRadius + params.margin
       val canvasSize = 2 * canvasHalfSize
 

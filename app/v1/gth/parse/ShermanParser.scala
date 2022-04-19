@@ -5,7 +5,7 @@ import scala.language.postfixOps
 
 @Singleton
 class ShermanParser @Inject()(letterTables: LetterTables) {
-  def parse(text: String): Iterable[ShermanWord] = text.trim split "\\s+" map word.parse collect {
+  def parse(text: String): Iterable[ShermanWord] = text.toUpperCase.trim split "\\s+" map word.parse collect {
     case ParserSuccess(_, result) => result
   }
 
