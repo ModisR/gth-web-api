@@ -12,10 +12,10 @@ class ShermanRenderer @Inject()() {
   def render(gallifreyan: Iterable[ShermanWord], params: RenderingParams = RenderingParams()): xml.Node =
     Utility.trim {
       val totalMargin = params.margin + params.lineWidth
-      val charRadius = params.fontSize / 2 + totalMargin
+      val charRadius = params.fontSize / 2.0 + totalMargin
 
       def getContentPos(n: Int, innerRadius: Double) = n match {
-        case 1 => 0
+        case 1 => 0.0
         case _ => (innerRadius + totalMargin) / Math.sin(Math.PI / n)
       }
 
