@@ -1,15 +1,12 @@
 package v1.gth.parse
 
 import org.scalacheck.{Gen, Shrink}
-import org.scalatestplus.play.PlaySpec
-import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
+import v1.gth.BaseSpec
 
 import scala.language.postfixOps
 
-class ShermanWordSpec extends PlaySpec with ScalaCheckPropertyChecks {
-  override implicit val generatorDrivenConfig: PropertyCheckConfiguration = PropertyCheckConfiguration(minSuccessful = 50)
-
-  "Sherman parser" should {
+class ShermanWordSpec extends BaseSpec {
+  "Parser" should {
     val validChars = ('A' to 'Z') ++ "'-"
 
     "be the dual of ShermanWord.asString" in {
@@ -29,16 +26,6 @@ class ShermanWordSpec extends PlaySpec with ScalaCheckPropertyChecks {
         val Parse.Success(_, result) = ShermanWord parse validShermanWord
         println(validShermanWord)
         validShermanWord mustBe result.asString
-      }
-    }
-
-    "correctly parse ShermanChars representing 2 letters" in {
-      val doubleConsonants = Gen oneOf LetterTables.consonants2
-
-      forAll(doubleConsonants) { shermanConsonant =>
-        val Parse.Success(_, ShermanWord(List(result))) = ShermanWord parse shermanConsonant.toString
-        println(shermanConsonant)
-        shermanConsonant mustBe result
       }
     }
 

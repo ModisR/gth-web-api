@@ -1,7 +1,6 @@
 package v1.gth.render
 
 import v1.gth.parse.{ShermanChar, ShermanWord}
-
 import javax.inject.{Inject, Singleton}
 import scala.language.postfixOps
 import scala.xml.Utility
