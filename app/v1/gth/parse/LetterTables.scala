@@ -1,11 +1,9 @@
 package v1.gth.parse
 
-import javax.inject.{Inject, Singleton}
+import v1.gth.parse.ShermanChar._
 
-@Singleton
-class LetterTables @Inject()() {
-
-  val vowelTable: Map[VowelBase, Map[VowelDeco, String]] = Map(
+object LetterTables {
+  private val vowelTable = Map(
     VowelTop -> Map(
       NoDeco -> "O"
     ),
@@ -19,13 +17,13 @@ class LetterTables @Inject()() {
     )
   )
 
-  val vowels: Iterable[ShermanVowel] = for {
+  val vowels: Iterable[Vowel] = for {
     (base, row) <- vowelTable
     (deco, str) <- row
-  } yield new ShermanVowel(base, deco, str)
+  } yield new Vowel(base, deco, str)
 
 
-  val consonantTable: Map[ConsonantBase, Map[ConsonantDeco, String]] = Map(
+  private val consonantTable = Map(
     ArcMajor -> Map(
       ConsonantDots(0) -> "B",
       ConsonantDots(2) -> "CH",
@@ -65,10 +63,10 @@ class LetterTables @Inject()() {
     )
   )
 
-  val consonants: Iterable[ShermanConsonant] = for {
+  private val consonants = for {
     (base, row) <- consonantTable
     (deco, str) <- row
-  } yield new ShermanConsonant(base, deco, str)
+  } yield new Consonant(base, deco, str)
 
   val (consonants2, consonants1) = consonants partition (_.toString.length > 1)
 }

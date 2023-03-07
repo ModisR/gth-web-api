@@ -4,53 +4,61 @@ import scala.language.postfixOps
 
 sealed abstract class ShermanChar(override val toString: String)
 
-/** START letters
-  * START consonants */
-final class ShermanConsonant(
-                              val base: ConsonantBase,
-                              val deco: ConsonantDeco,
-                              toString: String
-                            ) extends ShermanChar(toString)
+object ShermanChar {
+  private val parseConsonant: Parse[Consonant] = (Parse oneOf LetterTables.consonants2) orElse (Parse oneOf LetterTables.consonants1)
+  private val parseVowel: Parse[Vowel] = Parse oneOf LetterTables.vowels
+  private val parseNonLetter: Parse[ShermanChar] = Parse oneOf Seq(Apostrophe, Hyphen)
 
-sealed abstract class ConsonantBase
+  implicit val parse: Parse[ShermanChar] = parseConsonant orElse parseVowel orElse parseNonLetter
 
-case object ArcMajor extends ConsonantBase
+  /** START letters
+   * START consonants */
+  private[parse] final class Consonant(
+                                        val base: ConsonantBase,
+                                        val deco: ConsonantDeco,
+                                        toString: String
+                                      ) extends ShermanChar(toString)
 
-case object CircleIn extends ConsonantBase
+  private[parse] sealed abstract class ConsonantBase
 
-case object ArcMinor extends ConsonantBase
+  private[parse] case object ArcMajor extends ConsonantBase
 
-case object CircleOut extends ConsonantBase
+  private[parse] case object CircleIn extends ConsonantBase
 
-sealed abstract class ConsonantDeco
+  private[parse] case object ArcMinor extends ConsonantBase
 
-final case class ConsonantDots(num: Int) extends ConsonantDeco
+  private[parse] case object CircleOut extends ConsonantBase
 
-final case class ConsonantLines(num: Int) extends ConsonantDeco
+  abstract class ConsonantDeco
 
-/** END consonants |
-  * START vowels */
+  private[parse] final case class ConsonantDots(num: Int) extends ConsonantDeco
 
-final class ShermanVowel(val base: VowelBase, val deco: VowelDeco, toString: String) extends ShermanChar(toString)
+  private[parse] final case class ConsonantLines(num: Int) extends ConsonantDeco
 
-sealed abstract class VowelBase
+  /** END consonants |
+   * START vowels */
 
-case object VowelTop extends VowelBase
+  final class Vowel(val base: VowelBase, val deco: VowelDeco, toString: String) extends ShermanChar(toString)
 
-case object VowelMiddle extends VowelBase
+  sealed abstract class VowelBase
 
-case object VowelBottom extends VowelBase
+  private[parse] case object VowelTop extends VowelBase
 
-sealed abstract class VowelDeco
+  private[parse] case object VowelMiddle extends VowelBase
 
-case object NoDeco extends VowelDeco
+  private[parse] case object VowelBottom extends VowelBase
 
-case object LineUp extends VowelDeco
+  sealed abstract class VowelDeco
 
-case object LineDown extends VowelDeco
+  private[parse] case object NoDeco extends VowelDeco
 
-/** END vowels |
-  * END letters */
-case object ShermanApostrophe extends ShermanChar("'")
+  private[parse] case object LineUp extends VowelDeco
 
-case object ShermanHyphen extends ShermanChar("-")
+  private[parse] case object LineDown extends VowelDeco
+
+  /** END vowels |
+   * END letters */
+  private[parse] case object Apostrophe extends ShermanChar("'")
+
+  private[parse] case object Hyphen extends ShermanChar("-")
+}
