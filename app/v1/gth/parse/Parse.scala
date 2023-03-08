@@ -1,5 +1,6 @@
 package v1.gth.parse
 
+import v1.gth.init.Stringifiable
 import v1.gth.parse.Parse.{Failure, Success}
 
 import scala.annotation.tailrec
@@ -37,6 +38,8 @@ object Parse {
 
   def apply[A](implicit parse: Parse[A]): Parse[A] = parse
 
+  def apply[A](str: String)(implicit parse: Parse[A]): Output[A] = parse(str)
+
   def oneOf[A](items: Map[String, A]): Parse[A] = {
     val group = items.keys.toArray sortBy (-_.length) mkString "|"
     val pattern = "(" + group + ")(.*)" r
@@ -47,16 +50,25 @@ object Parse {
     }
   }
 
-  def oneOf[A](items: Iterable[A]): Parse[A] = oneOf(items map { item => item.toString -> item } toMap)
+  def oneOf[A <: Stringifiable](items: Iterable[A]): Parse[A] =
+    oneOf(items map { item => item.asString -> item } toMap)
 
-  def many[A](implicit parse: Parse[A]): Parse[Seq[A]] = {
+  implicit def option[A](implicit parse: Parse[A]): Parse[Option[A]] =
+    str => {
+      parse(str) match {
+        case Success(remaining, result) => Success(remaining, Option(result))
+        case Failure(_) => Success(str, None)
+      }
+    }
+
+  implicit def seqOf[A](implicit parse: Parse[A]): Parse[Seq[A]] = {
     @tailrec
-    def parseImpl(acc: Seq[A], text: String): Output[Seq[A]] =
+    def seqOfImpl(acc: Seq[A], text: String): Output[Seq[A]] =
       parse(text) match {
-        case Success(remaining, result) => parseImpl(acc :+ result, remaining)
+        case Success(remaining, result) => seqOfImpl(acc :+ result, remaining)
         case _ => Success(text, acc)
       }
 
-    parseImpl(Seq(), _)
+    seqOfImpl(Seq(), _)
   }
 }

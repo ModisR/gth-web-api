@@ -1,25 +1,16 @@
 package v1.gth.parse
 
-import org.scalacheck.{Arbitrary, Gen, Shrink}
+import org.scalacheck.{Gen, Shrink}
 import v1.gth.BaseSpec
-import v1.gth.init.ShermanConsonant
 
 import scala.language.postfixOps
 
 class ConsonantStackSpec extends BaseSpec {
   "Parser" should {
     "successfully undo method toString" in {
-      implicit val arbConsonantStack: Arbitrary[ConsonantStack] =
-        Arbitrary(
-          for {
-            head <- Gen oneOf ShermanConsonant.values
-            tail <- Gen listOf (Gen oneOf ShermanConsonant.table(head.base).keys)
-          } yield ConsonantStack(head, tail)
-        )
-
       forAll { consonantStack: ConsonantStack =>
-        val string = consonantStack.toString
-        val Parse.Success(remaining, result) = ConsonantStack parse string
+        val string = consonantStack.asString
+        val Parse.Success(remaining, result) = Parse[ConsonantStack](string)
 
         remaining mustBe empty
         result mustBe consonantStack
@@ -34,7 +25,7 @@ class ConsonantStackSpec extends BaseSpec {
       val invalidStrings = Gen listOf invalidChars map (_.mkString)
 
       forAll(invalidStrings) { invalidString =>
-        val result = ConsonantStack parse invalidString
+        val result = Parse[ConsonantStack](invalidString)
 
         assert(!result.isSuccess)
       }

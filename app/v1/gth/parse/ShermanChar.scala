@@ -1,20 +1,33 @@
 package v1.gth.parse
 
-sealed abstract class ShermanChar(val asString: String)
+import v1.gth.init.Stringifiable
+
+sealed abstract class ShermanChar(override val asString: String) extends Stringifiable
 
 object ShermanChar {
-  private[parse] final case class LetterStack(
-                                               consonants: Option[ConsonantStack],
-                                               vowels: Option[VowelStack]
-                                             ) extends ShermanChar(
-    consonants.fold("")(_.toString) ++ vowels.fold("")(_.toString)
+  final case class LetterStack(
+                                consonants: Option[ConsonantStack],
+                                vowels: Option[VowelStack]
+                              ) extends ShermanChar(
+    consonants.fold("")(_.asString) ++ vowels.fold("")(_.asString)
   )
 
-  private[parse] case object Apostrophe extends ShermanChar("'")
+  case object Apostrophe extends ShermanChar("'")
 
-  private[parse] case object Hyphen extends ShermanChar("-")
+  case object Hyphen extends ShermanChar("-")
 
-  private val parseLetterStack = new Parse[LetterStack]{ def apply(str: String): Parse.Output[LetterStack] = Parse Failure Seq("Unimplemented.") }
+  private val parseLetterStack: Parse[LetterStack] =
+    Parse[Option[ConsonantStack]] flatMap {
+      consonants =>
+        Parse[Option[VowelStack]] map {
+          vowels =>
+            LetterStack(consonants, vowels)
+        }
+    } andThen {
+      case Parse.Success(_, LetterStack(None, None)) => Parse.Failure(Seq("Unable to parse LetterStack."))
+      case other => other
+    } apply _
+
   private val parsePunctuation = Parse oneOf Seq(Apostrophe, Hyphen)
 
   implicit val parse: Parse[ShermanChar] = parseLetterStack orElse parsePunctuation

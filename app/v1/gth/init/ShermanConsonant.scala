@@ -3,7 +3,7 @@ package v1.gth.init
 import v1.gth.init.ShermanConsonant.{Base, Decoration}
 import v1.gth.parse.Parse
 
-final case class ShermanConsonant(base: Base, deco: Decoration, override val toString: String)
+final case class ShermanConsonant(base: Base, deco: Decoration, override val asString: String) extends Stringifiable
 
 object ShermanConsonant {
   val table: Map[Base, Map[Decoration, String]] = Map(
@@ -49,7 +49,7 @@ object ShermanConsonant {
   val values: Iterable[ShermanConsonant] = for {
     (base, row) <- table
     (deco, str) <- row
-  } yield new ShermanConsonant(base, deco, str)
+  } yield ShermanConsonant(base, deco, str)
 
   implicit val parse: Parse[ShermanConsonant] = Parse oneOf values
 

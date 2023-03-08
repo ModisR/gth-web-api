@@ -5,5 +5,5 @@ final case class ShermanWord(chars: Seq[ShermanChar]) {
 }
 
 object ShermanWord {
-  implicit val parse: Parse[ShermanWord] = Parse.many[ShermanChar] map apply
+  implicit val parse: Parse[ShermanWord] = Parse.seqOf[ShermanChar] map apply
 }

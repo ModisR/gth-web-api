@@ -10,8 +10,8 @@ class ShermanVowelSpec extends BaseSpec {
   "Parser" should {
     "invert asString method" in {
       ShermanVowel.values foreach { vowel =>
-        val string = vowel.toString
-        val Parse.Success(_, result) = ShermanVowel parse string
+        val string = vowel.asString
+        val Parse.Success(_, result) = Parse[ShermanVowel](string)
 
         vowel mustBe result
       }
