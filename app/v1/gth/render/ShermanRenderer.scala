@@ -1,12 +1,14 @@
 package v1.gth.render
 
-import v1.gth.parse.{ShermanChar, ShermanWord}
+import v1.gth.parse.ShermanChar
+
 import javax.inject.{Inject, Singleton}
 import scala.language.postfixOps
 import scala.xml.Utility
 
 @Singleton
 class ShermanRenderer @Inject()() {
+  type ShermanWord = Seq[ShermanChar]
 
   def render(gallifreyan: Iterable[ShermanWord], params: RenderingParams = RenderingParams()): xml.Node =
     Utility.trim {
@@ -17,7 +19,7 @@ class ShermanRenderer @Inject()() {
         case _ => (innerRadius + params.margin) / Math.sin(Math.PI / n)
       }
 
-      val maxWordLen = gallifreyan.map(_.chars.length).max
+      val maxWordLen = gallifreyan.map(_.length).max
       val charPos = getContentPos(maxWordLen, charRadius)
 
       val wordRadius = charPos + charRadius + params.margin
@@ -32,13 +34,13 @@ class ShermanRenderer @Inject()() {
         val cys = cy.toString
           <circle cx={cxs} cy={cys} r={charRadius.toString}/>
           <text x={cxs} y={cys} text-anchor="middle" dy="0.375em">
-            {char.toString}
+            {char.asString}
           </text>
       }
 
       def renderWord(cx: Double, cy: Double, word: ShermanWord) = {
-        val ang = 2 * Math.PI / word.chars.length
-        val chars = word.chars.zipWithIndex map {
+        val ang = 2 * Math.PI / word.length
+        val chars = word.zipWithIndex map {
           case (char, k) =>
             renderChar(
               cx + charPos * Math.sin(k * ang),

@@ -1,7 +1,7 @@
 package v1.gth
 
 import play.api.mvc._
-import v1.gth.parse.{Parse, ShermanWord}
+import v1.gth.parse.{Parse, ShermanChar}
 import v1.gth.render.ShermanRenderer
 
 import javax.inject.Inject
@@ -11,8 +11,8 @@ class TranslationController @Inject()(val controllerComponents: ControllerCompon
                                       renderer: ShermanRenderer)
   extends BaseController {
 
-  private def parseWords(text: String): Iterable[ShermanWord] =
-    text.toUpperCase.trim split "\\s+" map Parse[ShermanWord] collect {
+  private def parseWords(text: String): Array[Seq[ShermanChar]] =
+    text.toUpperCase.trim split "\\s+" map Parse.seqOf[ShermanChar] collect {
       case Parse.Success(_, result) => result
     }
 

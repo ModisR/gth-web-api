@@ -5,17 +5,17 @@ import v1.gth.BaseSpec
 
 class ShermanCharSpec extends BaseSpec {
   "Parser" should {
-    "successfully undo method toString" in {
+    "successfully undo method asString" in {
       forAll { shermanChar: ShermanChar =>
-        val string = shermanChar.asString
-        val Parse.Success(remaining, result) = Parse[ShermanChar](string)
+        val validString = shermanChar.asString
+        val Parse.Success(remaining, result) = Parse[ShermanChar](validString)
 
         remaining mustBe empty
-        result mustBe shermanChar
+        validString mustBe result.asString
       }
     }
 
-    "fail on strings containing no consonants" in {
+    "fail on strings containing no valid chars" in {
       import org.scalacheck.Shrink.shrinkAny
 
       val validChars = '\'' +: '-' +: ('A' to 'Z')
