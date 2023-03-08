@@ -1,10 +1,18 @@
 package v1.gth.parse
 
+import v1.gth.parse.Parse.{Failure, Success}
+
 import scala.annotation.tailrec
 import scala.language.postfixOps
 
 abstract class Parse[+A] extends (String => Parse.Output[A]) {
   def map[B](f: A => B): Parse[B] = apply(_) map f
+
+  def flatMap[B](f: A => Parse[B]): Parse[B] =
+    apply(_) match {
+      case Success(remaining, result) => f(result)(remaining)
+      case Failure(errors) => Failure(errors)
+    }
 
   def orElse[B >: A](parse: Parse[B]): Parse[B] = text => {
     apply(text) match {
@@ -27,18 +35,19 @@ object Parse {
     def map[B](f: Nothing => B): Output[Nothing] = this
   }
 
-  def apply[A](string: String)(implicit parse: Parse[A]): Output[A] = parse(string)
+  def apply[A](implicit parse: Parse[A]): Parse[A] = parse
 
-  def oneOf[A](items: Iterable[A]): Parse[A] = {
-    val itemMap = items map { item => item.toString -> item } toMap
-    val group = itemMap.keys mkString "|"
+  def oneOf[A](items: Map[String, A]): Parse[A] = {
+    val group = items.keys.toArray sortBy (-_.length) mkString "|"
     val pattern = "(" + group + ")(.*)" r
 
     {
-      case pattern(target, remaining) => Success(remaining, itemMap(target))
+      case pattern(target, remaining) => Success(remaining, items(target))
       case _ => Failure(Seq(s"Unable to match string to pattern: $pattern."))
     }
   }
+
+  def oneOf[A](items: Iterable[A]): Parse[A] = oneOf(items map { item => item.toString -> item } toMap)
 
   def many[A](implicit parse: Parse[A]): Parse[Seq[A]] = {
     @tailrec

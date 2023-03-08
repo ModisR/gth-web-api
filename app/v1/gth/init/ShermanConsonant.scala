@@ -6,7 +6,7 @@ import v1.gth.parse.Parse
 final case class ShermanConsonant(base: Base, deco: Decoration, override val toString: String)
 
 object ShermanConsonant {
-  private val table = Map(
+  val table: Map[Base, Map[Decoration, String]] = Map(
     ArcMajor -> Map(
       Dots(0) -> "B",
       Dots(2) -> "CH",
@@ -51,9 +51,7 @@ object ShermanConsonant {
     (deco, str) <- row
   } yield new ShermanConsonant(base, deco, str)
 
-  private val (doubleChars, singleChars) = values partition (_.toString.length > 1)
-
-  implicit val parse: Parse[ShermanConsonant] = (Parse oneOf doubleChars) orElse (Parse oneOf singleChars)
+  implicit val parse: Parse[ShermanConsonant] = Parse oneOf values
 
   sealed abstract class Base
 
