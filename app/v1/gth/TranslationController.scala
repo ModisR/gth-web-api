@@ -1,5 +1,6 @@
 package v1.gth
 
+import play.api.libs.json.Json
 import play.api.mvc._
 import v1.gth.parse.{Parse, ShermanChar}
 import v1.gth.render.ShermanRenderer
@@ -17,9 +18,10 @@ class TranslationController @Inject()(val controllerComponents: ControllerCompon
     }
 
   def translate(input: String): Action[AnyContent] = Action {
-
-    println(s"Received request: $input")
-
     Ok(renderer.render(parseWords(input)))
+  }
+
+  def json(input: String): Action[AnyContent] = Action {
+    Ok(Json toJson parseWords(input))
   }
 }

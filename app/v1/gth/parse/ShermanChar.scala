@@ -1,6 +1,9 @@
 package v1.gth.parse
 
+import play.api.libs.json.{Json, OWrites}
 import v1.gth.init.Stringifiable
+
+import scala.language.postfixOps
 
 sealed abstract class ShermanChar(override val asString: String) extends Stringifiable
 
@@ -31,4 +34,10 @@ object ShermanChar {
   private val parsePunctuation = Parse oneOf Seq(Apostrophe, Hyphen)
 
   implicit val parse: Parse[ShermanChar] = parseLetterStack orElse parsePunctuation
+
+  implicit val writes: OWrites[ShermanChar] = {
+    case ls: LetterStack => Json.writes[LetterStack] writes ls
+    case Hyphen => Json.obj("punctuation" -> "Hyphen")
+    case Apostrophe => Json.obj("punctuation" -> "Apostrophe")
+  }
 }

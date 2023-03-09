@@ -1,3 +1,4 @@
 ->         /v1/posts                      v1.post.PostRouter
 
 GET        /v1/gth/translate/:input       v1.gth.TranslationController.translate(input: String)
+GET        /v1/gth/json/:input            v1.gth.TranslationController.json(input: String)

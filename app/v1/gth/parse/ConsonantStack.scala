@@ -1,5 +1,6 @@
 package v1.gth.parse
 
+import play.api.libs.json.{Json, OWrites}
 import v1.gth.init.{ShermanConsonant, Stringifiable}
 
 import scala.language.postfixOps
@@ -19,4 +20,6 @@ object ConsonantStack {
         .seqOf(Parse oneOf ShermanConsonant.table(head.base).map(_.swap))
         .map(ConsonantStack(head, _))
     }
+
+  implicit val writes: OWrites[ConsonantStack] = Json.writes
 }

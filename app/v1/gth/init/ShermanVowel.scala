@@ -1,5 +1,6 @@
 package v1.gth.init
 
+import play.api.libs.json.{JsString, Json, OWrites, Writes}
 import v1.gth.init.ShermanVowel.{Base, Decoration}
 import v1.gth.parse.Parse
 
@@ -42,4 +43,8 @@ object ShermanVowel {
   } yield ShermanVowel(base, deco, str)
 
   implicit val parse: Parse[ShermanVowel] = Parse oneOf values
+
+  implicit val writesBase: Writes[Base] = base => JsString(base.toString)
+  implicit val writesDeco: Writes[Decoration] = deco => JsString(deco.toString)
+  implicit val writes: OWrites[ShermanVowel] = Json.writes
 }

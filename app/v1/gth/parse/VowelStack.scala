@@ -1,5 +1,6 @@
 package v1.gth.parse
 
+import play.api.libs.json.{Json, OWrites}
 import v1.gth.init.{ShermanVowel, Stringifiable}
 
 import scala.language.postfixOps
@@ -18,4 +19,6 @@ object VowelStack {
         .seqOf(Parse oneOf ShermanVowel.table(head.base).map(_.swap))
         .map(VowelStack(head, _))
     }
+
+  implicit val writes: OWrites[VowelStack] = Json.writes
 }
